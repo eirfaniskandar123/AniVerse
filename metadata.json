@@ -1,0 +1,5 @@
+{
+  "name": "AniVerse Search",
+  "description": "A sleek and modern web application to search for your favorite anime, explore details, characters, and more. Built with React, Redux, and Tailwind CSS, it offers a fast, responsive, and visually engaging user experience.",
+  "requestFramePermissions": []
+}
