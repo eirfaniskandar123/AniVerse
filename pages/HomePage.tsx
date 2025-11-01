@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchAnime, fetchGenres } from '../store/slices/animeSlice';
 import SearchBar from '../components/SearchBar';
@@ -18,19 +18,13 @@ const HomePage: React.FC = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const isInitialMount = useRef(true);
+  const pageResetEffectRan = useRef(false);
 
   useEffect(() => {
     dispatch(fetchGenres());
   }, [dispatch]);
 
   useEffect(() => {
-    // Prevent fetching on initial mount with empty search term
-    if (isInitialMount.current && debouncedSearchTerm === '' && selectedGenre === null) {
-      isInitialMount.current = false;
-      return;
-    }
-    
     const promise = dispatch(fetchAnime({ 
       query: debouncedSearchTerm, 
       page: currentPage, 
@@ -40,14 +34,14 @@ const HomePage: React.FC = () => {
     return () => {
       promise.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm, selectedGenre, currentPage, dispatch]);
   
-  // Reset page to 1 when search term or genre changes
+  // Reset page to 1 when search term or genre changes, but not on initial render
   useEffect(() => {
-    if(!isInitialMount.current) {
+    if (pageResetEffectRan.current) {
         setCurrentPage(1);
     }
+    pageResetEffectRan.current = true;
   }, [debouncedSearchTerm, selectedGenre]);
 
   const handlePageChange = (page: number) => {
